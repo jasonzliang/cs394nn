@@ -5,8 +5,8 @@ Created on Nov 16, 2013
 '''
 from pybrain.structure import FeedForwardNetwork, LinearLayer, SigmoidLayer, FullConnection
 from pybrain.tools.shortcuts import buildNetwork
-from pybrain.optimization import CMAES, NelderMead, ExactNES, FEM
-import csv, time, cPickle
+from pybrain.optimization import CMAES, NelderMead, ExactNES, FEM, StochasticHillClimber
+import csv, time, cPickle, math
 
 def generateNetwork(structure):
 #   n = buildNetwork(*structure, fast=False, outclass=SigmoidLayer)
@@ -25,13 +25,18 @@ def generateNetwork(structure):
   n.sortModules()
   return n
 
-networkStructure = [8,16,1]
+networkStructure = [8,8,8,8,1]
 myNetwork = generateNetwork(networkStructure)
 assert 2**networkStructure[0] > len(myNetwork.params)
 
 def fitnessFunction(weights):
-#   print len(weights)
-#   print len(myNetwork.params)
+  def getEntrophy():
+    term = 0.0
+    for weight in weights:
+      weight = abs(weight) + 0.00001
+      term += math.log(weight)*weight
+    return -1*term
+  
   myNetwork._setParameters(weights)
 
   error = 0.0
@@ -77,7 +82,8 @@ def experiment2():
   l.minimize = True
   l.verbose = True
   l.maxLearningSteps = 1000
-  l.learn()
+  params, fitness = l.learn()
+  myNetwork._setParameters(params)
   logNet()
   
 def experiment3():
@@ -85,27 +91,39 @@ def experiment3():
   l.minimize = True
   l.verbose = True
   l.maxLearningSteps = 1000
-  l.learn()
+  params, fitness = l.learn()
+  myNetwork._setParameters(params)
   logNet()
   
 def experiment4():
   l = FEM(fitnessFunction, myNetwork.params)
   l.minimize = True
   l.verbose = True
+  l.maxLearningSteps = 10000
+  params, fitness = l.learn()
+  myNetwork._setParameters(params)
+  logNet()
+  
+def experiment5():
+  l = StochasticHillClimber(fitnessFunction, myNetwork.params)
+  l.minimize = True
+  l.verbose = True
   l.maxLearningSteps = 1000
-  l.learn()
+  params, fitness = l.learn()
+  myNetwork._setParameters(params)
   logNet()
   
 if __name__ == '__main__':
-  experiment1()
-#   loadNet('results_[8, 16, 1]_1384670399.89.pkl')
-#   error = 0.0
-#   for i,weight in enumerate(myNetwork.params):
-#     output = myNetwork.activate(position2input(i))[0]
-#     print weight, output
-#     error += abs(weight - output)
-#     
-#   print error
+#   experiment1()
+  loadNet('results_[8, 8, 8, 8, 1]_1384743939.68.pkl')
+  error = 0.0
+  for i,weight in enumerate(myNetwork.params):
+    output = myNetwork.activate(position2input(i))[0]
+    print weight, output
+    error += abs(weight - output)
+      
+  print error
+  
 #     n = generateNetwork([2,2,1])
 #     n.params = [1,0,0,0,0,0]
 #     print n.params
