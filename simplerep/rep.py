@@ -19,10 +19,8 @@ def toActivationFunction(x):
    pool = ann.activationFunctionPool
    i = int(fPart * len(pool))
    return pool[i]
-   #int(x) * len(pool)
-   #x = int(len(pool) * x) % len(pool)
-   #return pool[x]
 
+# the parent outputs a sequence of connections
 def decodeANN(net, maxSteps):
    net.zeroAllActivation()
    net.setAllInput([])
@@ -80,22 +78,19 @@ def decodeANN(net, maxSteps):
    tag = tagNonNegative + list(reversed(tagNegative))
 
    # create a net
-   #afNonNegative = [activationFunction[t] for t in tagNonNegative]
-   #afNegative = [activationFunction[t] for t in tagNegative]
-   #af = afNonNegative + afNegative
    af = [activationFunction[t] for t in tag]
    child = ann.ArbitraryNeuralNetwork(af)
 
    # set the weights of the net
    index = {tag[i] : i for i in range(len(tag))}
    for (target, source), w in weight.items():
-      #t = tag.index(target)
-      #s = tag.index(source)
       t = index[target]
       s = index[source]
       child.weight[t][s] = w
 
    return child
+
+
 
 import collections
 Candidate = collections.namedtuple('Candidate', ['ind','gen'])
@@ -112,31 +107,34 @@ population = [
 
 # enforcing at least some criterion on offspring
 # rewards useful, long germ lines
-N_NEURON_MIN = 8
+N_NEURON_MIN = 1
 while True:
    try:
       iParent = random.randrange(len(population))
       parent = population[iParent].ind
       child = decodeANN(parent, MAX_STEPS)
 
-      if child.size < N_NEURON_MIN:
-         population[iParent] = Candidate(
-            myRandomNet(), 0)
-      else:
-         population[iParent] = Candidate(
-            child, population[iParent].gen + 1)
+      #if False:
+      #   if child.size < N_NEURON_MIN:
+      #      population[iParent] = Candidate(
+      #         myRandomNet(), 0)
+      #   else:
+      #      population[iParent] = Candidate(
+      #         child, population[iParent].gen + 1)
 
-      if False:
-         # kill parents with cruddy children
-         if child.size < N_NEURON_MIN:
-            population[iParent] = Candidate(myRandomNet(), generation)
-            print(".", end="")
-         # otherwise propogate by replacing another individual
-         else:
-            iDead = random.randrange(len(population) - 1)
-            if iDead >= iParent:
-               iDead += 1
-            population[iDead] = Candidate(child, population[iParent].gen)
+      # kill parents with cruddy children
+      if child.size < N_NEURON_MIN:
+         # make this better
+         # must allow good networks to take over?
+         # but you kinda do. just weakly
+         population[iParent] = Candidate(myRandomNet(), generation)
+         print(".", end="")
+      # otherwise propogate by replacing another individual
+      else:
+         iDead = random.randrange(len(population) - 1)
+         if iDead >= iParent:
+            iDead += 1
+         population[iDead] = Candidate(child, population[iParent].gen)
 
       generation += 1
    except KeyboardInterrupt:
