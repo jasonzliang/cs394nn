@@ -7,6 +7,7 @@ from pybrain.structure import FeedForwardNetwork, LinearLayer, SigmoidLayer, Ful
 from pybrain.tools.shortcuts import buildNetwork
 from pybrain.optimization import CMAES, NelderMead, ExactNES, FEM, StochasticHillClimber
 import csv, time, cPickle, math
+import numpy as np
 
 def generateNetwork(structure):
 #   n = buildNetwork(*structure, fast=False, outclass=SigmoidLayer)
@@ -112,17 +113,17 @@ def experiment5():
   params, fitness = l.learn()
   myNetwork._setParameters(params)
   logNet()
-  
+
 if __name__ == '__main__':
-#   experiment1()
-  loadNet('results_[8, 8, 8, 8, 1]_1384743939.68.pkl')
-  error = 0.0
-  for i,weight in enumerate(myNetwork.params):
-    output = myNetwork.activate(position2input(i))[0]
-    print weight, output
-    error += abs(weight - output)
-      
-  print error
+  experiment1()
+#   loadNet('results_[8, 8, 8, 8, 1]_1384743939.68.pkl')
+#   error = 0.0
+#   for i,weight in enumerate(myNetwork.params):
+#     output = myNetwork.activate(position2input(i))[0]アイスランド
+#     print weight, output
+#     error += abs(weight - output)
+#       
+#   print error
   
 #     n = generateNetwork([2,2,1])
 #     n.params = [1,0,0,0,0,0]
