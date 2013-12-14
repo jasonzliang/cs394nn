@@ -1,0 +1,46 @@
+%f='selfrep'; b='selfrep'; pdflatex $f.tex && bibtex $f && pdflatex $f.tex && pdflatex $f.tex && rm $f.log $f.aux && evince $f.pdf &>/dev/null &disown
+
+
+
+\documentclass[12pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[protrusion=true,
+            expansion=true]{microtype}
+%\usepackage{amssymb}
+%\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{color}
+\usepackage[usenames,
+            dvipsnames]{xcolor}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage{kpfonts}
+\usepackage[T1]{fontenc}
+\usepackage{setspace}
+\singlespacing
+%\onehalfspacing
+%\doublespacing
+
+
+
+\newcommand{\term}[1]{\emph{#1}}
+
+
+
+\begin{document}
+
+\title{Programs that Program}
+\author{Keenan Breik. Jason Liang}
+\date{}
+\maketitle
+
+\section*{Introduction}
+
+\cite{stanley2007regularities}
+
+\bibliography{selfrep}
+\bibliographystyle{plain}
+
+\end{document}
