@@ -42,29 +42,97 @@
 Evolutionary computation allows computers
 to automatically solve problems
 that can be cast as optimization problems.
-Until now, instantiations have been
+Until now, implementations have been
 in large part hand designed.
 Designers struggle to find meaningful constructs
-and optimal tunings.
+and optimal tunings that allow evolutionary compuatation
+to efficiently and effectively solve problems.
+%to efficient, effective evolutionary computation.
+%This design is part of solving target problems,
+But once it is factored into the cost
+of solving that problem,
+that struggle is unjustifiable.
 
 We propose to allow computers
-to automatically design such instantiations
+to automatically design such implementations
 by using evolutionary computation itself.
-To do so, we desire programs
-that write other programs
-and thereby explore a search space.
+One way of doing this is to set up
+an existing implementation,
+such as genetic programming,
+to search for a better one.
+But by using a fixed implementation,
+we must wait until the the process completes
+to get a usable result,
+and we still must hand-pick that fixed implementation.
+An alternative is to start with an implementation
+and allow it to modify itself.
+Thus it would improve over time
+and also improve at improving itself.
+
+Two essential elements of an implementation
+that must be established
+are the candidate solution representation
+and the population operators.
+The representation is a form for storing a candidate
+along with a decoding method
+to extract it from storage.
+To be general,
+this representation can be an arbitrary program.
+The population operators
+generate new individuals from the current population.
+To be general,
+these operators can be arbitrary programs.
+
 In this paper,
 we demonstrate that neural networks
 can generate other meaningful neural networks.
-[Be clear. Elaborate.]
+Since arbitrary neural networks are computationally powerful,%
+\cite{sperduti1997netpower}
+we can use them as candidate solution representations
+and also as population operators.
 
-%Section ? discusses related work.
-%Section ? discusses decoding neural networks.
-%Section ? discusses the evolutionary techniques used.
-%Section ? discusses experiments with feedforward networks.
-%Section ? discusses experiments with arbitrary networks.
+%[explain how programs that program
+%would give us this]
+%
+%To do so, we desire programs
+%that write other programs
+%and thereby explore a search space.
+%
+%In this paper,
+%we demonstrate that neural networks
+%can generate other meaningful neural networks.
+%[Be clear. Elaborate.]
 
-The following is a quick overview of the rest of the paper: In section \ref{problemstatement}, we discuss the general problem of generating networks. In section \ref{feedforward}, we will go over methods for constructing self-replicating feed-forward neural networks. Next, in section \ref{results}, we will discuss experimental results. Finally in the last section, we present conclusions and future work.
+%[Explain why self-replication.]
+
+The following is an overview of the rest of the paper:
+In section \ref{problemstatement}, we discuss the general problem of generating networks.
+In section \ref{feedforward}, we go over our methods for constructing self-replicating feedforward neural networks.
+In section \ref{results}, we will discuss experimental results. Finally in section \ref{conclusion}, we present conclusions and future work.
+
+\section{Related Work}
+\label{related}
+
+Meta-optimization
+has been used to tune implementations
+of evolutionary computation.%
+\cite{brest2006param}
+
+Hyper-heuristics
+have been used to avoid chosing a single fixed implementation.
+
+Parameter-free, self-optimizing metaheuristic.
+
+Gentic programming has been used
+to automatically develop computer programs.
+Evolutionary 
+
+We draw on the notion of a CPPN (compositional
+pattern-producing network).\cite{stanley2007cppn}
+CPPNs, however, are meant to encode the structure
+of a network, whereas we use them
+for more general purpose information storage
+and pattern generation.
 
 \section{Decoding Networks}
 \label{problemstatement}
@@ -107,7 +175,8 @@ we prefer the decoding function $D$
 to be neither completely stable
 nor completely chaotic.
 Instead, we want it somewhere around the edge of chaos.%
-\cite{langton1990edgechaos}
+\cite{langton1990edgechaos}%
+\cite{bertschinger2004edgechaos}
 This seems to pose a challenge,
 but the function or program a neural network encodes
 satisfies exactly this property.
@@ -120,20 +189,17 @@ such as how its neurons connect,
 to be stored at particular points
 in $f_N$
 or to be outputs of $P_N$.
-%We query $N$ to extract the features of $D(N)$
-%by applying $f_N$ or $P_N$ at particular points.
-%In this way,
-%we draw on the notion of a compositional
-%pattern-producing network.\cite{stanley2007cppn}
+To extract the features of $D(N)$,
+we simply query $N$ at such points.
 
-\section{Self-Replicating Feed-forward Neural Networks}
+\section{Self-Replicating Feedforward Neural Networks}
 \label{feedforward}
 
-To create a self-replicating feed-forward neural network, we first use the pyBrain neural network library \cite{schaul2010} to create an initial neural network that has a fixed topology. By fixed topology, we mean that the number of input neurons, output neurons, hidden layers, neurons, and number of connections remain constant. The only parameters we plan to optimize in order to generate self-replicating neural networks are  the weights of the connections between neurons. Since a feed-forward neural network can have many variations in its topology, we have chosen a simple structure that makes the most sense. 
+To create a self-replicating feedforward neural network, we first use the pyBrain neural network library \cite{schaul2010} to create an initial neural network that has a fixed topology. By fixed topology, we mean that the number of input neurons, output neurons, hidden layers, neurons, and number of connections remain constant. The only parameters we plan to optimize in order to generate self-replicating neural networks are  the weights of the connections between neurons. Since a feedforward neural network can have many variations in its topology, we have chosen a simple structure that makes the most sense. 
 
-One major challenge is deciding what kind of input to feed into the neural network and how to interpret the output of the neural network as another neural net. For simplicity, we decided on giving our neural network a N-bit vector of binary numbers as input. If we topologically linearize all the connections in the neural network, we can associate the value of binary vector with a corresponding connection. For example, the binary vector 1001 can be associated with the 5th connection in a small network with 8 connections in total. Accordingly, the output of the neural network is a single value and it represents the weight of the connection specified by the input vector. Thus, by feeding the neural network a set of inputs that map to all the connections in the network, we can generate weights for each of connections. This means that the network is capable of generating another net exactly like itself in topology, but with possibly different connection weights. 
+One major challenge is deciding what kind of input to feed into the neural network and how to interpret the output of the neural network as another neural net. For simplicity, we decided on giving our neural network a N-bit vector of binary numbers as input. If we sequence all the connections in the neural network, we can associate the value of binary vector with a corresponding connection. For example, the binary vector 1001 can be associated with the 5th connection in a small network with 8 connections in total. Accordingly, the output of the neural network is a single value and it represents the weight of the connection specified by the input vector. Thus, by feeding the neural network a set of inputs that map to all the connections in the network, we can generate weights for each of connections. This means that the network is capable of generating another net exactly like itself in topology, but with possibly different connection weights. 
 
-The next step is come up with a method to optimize the connection weights of the original network such that child network generated also has the same connection weight. Given the lack of gradients in this problem, we decide to rely on a black-box optimization approach to optimize the connection weights of the parent network. Thus we will require a fitness function that evaluates how close the the neural network is to generating a child network exactly like itself. To compute a fitness value, as seen in Fig.~\ref{pseudo}, we use the parent network to compute the connection weights of the child network, determine the error between the new connection weight and its original value in the parent network, and return the sum of all the errors. Now we can try a variety of different black-box optimization methods, including genetic algorithms \cite{deb2002fast}, CMAES \cite{hansen2003reducing}, and NES \cite{wierstra2008natural} to try to minimize the error and maximize the fitness of the neural network. Experimentally, we found that using CMAES resulted the most improvement in fitness every generation. 
+The next step is come up with a method to optimize the connection weights of the original network such that child network generated also has the same connection weight. Given the lack of gradients in this problem, we decide to rely on a black-box optimization approach to optimize the connection weights of the parent network. Thus we require a fitness function that evaluates how close the the neural network is to generating a child network exactly like itself. To compute a fitness value, as seen in Fig.~\ref{pseudo}, we use the parent network to compute the connection weights of the child network, determine the error between the new connection weight and its original value in the parent network, and return the sum of all the errors. Now we can try a variety of different black-box optimization methods, including genetic algorithms \cite{deb2002fast}, CMA-ES \cite{hansen2003reducing}, and NES \cite{wierstra2008natural} to try to minimize the error and maximize the fitness of the neural network.
 
 \begin{figure}[h]
 \begin{center}
@@ -143,10 +209,9 @@ The next step is come up with a method to optimize the connection weights of the
 \label{pseudo}
 \end{figure} 
 
-\section*{Related Work}
-
-Genetic programming?
-Compositional pattern-producing networks.
+%\section*{Related Work}
+%Genetic programming?
+%Compositional pattern-producing networks.
 
 %We consider ? schemes.
 %[x0 ... xn] [y0 ... yn] ---> w
@@ -158,6 +223,8 @@ Compositional pattern-producing networks.
 
 \section{Experimental Results}
 \label{results}
+
+Experimentally, we found that using CMA-ES resulted in the most improvement in fitness every generation.
 
 \section{Conclusion. Future Work.}
 \label{conclusion}
