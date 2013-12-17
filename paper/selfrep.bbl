@@ -1,0 +1,28 @@
+\begin{thebibliography}{1}
+
+\bibitem{deb2002fast}
+Kalyanmoy Deb, Amrit Pratap, Sameer Agarwal, and TAMT Meyarivan.
+\newblock A fast and elitist multiobjective genetic algorithm: Nsga-ii.
+\newblock {\em Evolutionary Computation, IEEE Transactions on}, 6(2):182--197,
+  2002.
+
+\bibitem{hansen2003reducing}
+Nikolaus Hansen, Sibylle~D M{\"u}ller, and Petros Koumoutsakos.
+\newblock Reducing the time complexity of the derandomized evolution strategy
+  with covariance matrix adaptation (cma-es).
+\newblock {\em Evolutionary Computation}, 11(1):1--18, 2003.
+
+\bibitem{schaul2010}
+Tom Schaul, Justin Bayer, Daan Wierstra, Yi~Sun, Martin Felder, Frank Sehnke,
+  Thomas R\"{u}ckstie\ss, and J\"{u}rgen Schmidhuber.
+\newblock {PyBrain}.
+\newblock {\em Journal of Machine Learning Research}, 2010.
+
+\bibitem{wierstra2008natural}
+Daan Wierstra, Tom Schaul, Jan Peters, and Juergen Schmidhuber.
+\newblock Natural evolution strategies.
+\newblock In {\em Evolutionary Computation, 2008. CEC 2008.(IEEE World Congress
+  on Computational Intelligence). IEEE Congress on}, pages 3381--3387. IEEE,
+  2008.
+
+\end{thebibliography}
