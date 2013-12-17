@@ -86,6 +86,9 @@ Since arbitrary neural networks are computationally powerful,%
 \cite{sperduti1997netpower}
 we can use them as candidate solution representations
 and also as population operators.
+Here however,
+we only evolve networks
+that reproduce themselves.
 
 %[explain how programs that program
 %would give us this]
@@ -205,6 +208,7 @@ we simply query $N$ at such points.
 %\section{Evolution}
 %algorithms. fitness functions.
 
+\section{Self-replicating Feedforward Networks}
 \label{feedforward}
 
 To create a self-replicating feedforward neural network,
@@ -286,6 +290,46 @@ which is then inverted to become a fitness value.}
 \label{pseudo}
 \end{figure} 
 
+\section{Replicating Arbitrary Networks}
+\label{arbitrary}
+
+We also worked with arbitrarily recurrent neural networks.
+Again we are faced with the problem
+of specifying inputs and outputs.
+One option is to do so in the same way
+as with feedforward neural networks
+as summarized in figure~\ref{arbitrarybadio}.
+But since we will need
+to repeatedly halt the network
+after some arbitrary interval
+and restart it,
+this approach does not exploit
+the power of recurrency.
+%But since recurrent neural networks
+%have no natural point of completion,
+%we must halt them
+%But this requires running the network
+%But this does not exploit
+
+Instead we allow the network to run freely
+and output at its own pace.
+[edit point]
+
+\begin{figure}[h]
+  \centering
+  \begin{tabular}{ll}
+  \toprule
+  inputs            & outputs \\
+  \midrule
+  neuron count flag & neuron count \\
+  target neuron, t  & weight $w_{t,s}$ \\
+  source neuron, s  & \\
+  \bottomrule
+  \end{tabular}
+  \caption{}
+  \label{arbitrarybadio}
+\end{figure}
+
 \section{Experimental Results}
 \label{results}
 
@@ -293,7 +337,7 @@ For our first experiment,
 we test to see if feedforward neural networks
 could replicate themselves using the method described
 in section \ref{feedforward}.
-For our feed-forward neural network topology,
+For our feedforward neural network topology,
 we decide on having an input layer with 8 neurons,
 2 hidden layers with 12 neurons each,
 and finally an output layer with a single neuron.
@@ -306,7 +350,7 @@ The sigmoid allows the neural network
 to output any range of values between -1 and 1.
 Accordingly, the connection weights
 of all the neurons are all randomly initialized between -1 and 1.
-We optimize using CMAES
+We optimize using CMA-ES
 as described in the methodology for 500 generations.
 
 Fig.~\ref{result1} shows how error goes down
