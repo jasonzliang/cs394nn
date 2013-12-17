@@ -41,7 +41,10 @@
 Evolutionary computation allows computers
 to automatically solve problems
 that can be cast as optimization problems.
-Until now, instantiations have been hand designed.
+Until now, instantiations have been
+in large part hand designed.
+Designers struggle to find meaningful constructs
+and optimal tunings.
 
 We propose to allow computers
 to automatically design such instantiations
@@ -49,12 +52,107 @@ by using evolutionary computation itself.
 To do so, we desire programs
 that write other programs
 and thereby explore a search space.
-In this paper, we demonstrate
-that neural networks
-(which can behave as programs or program components)
+In this paper,
+we demonstrate that neural networks
 can generate other meaningful neural networks.
+[Be clear. Elaborate.]
 
-\cite{stanley2002neat}
+Section ? discusses related work.
+Section ? discusses decoding neural networks.
+Section ? discusses the evolutionary techniques used.
+Section ? discusses experiments with feedforward networks.
+Section ? discusses experiments with arbitrary networks.
+
+\section*{Related Work}
+
+Genetic programming?
+Compositional pattern-producing networks.
+
+\section*{Decoding Networks}
+
+A feedforward neural network $N$ encodes a function $f_N$
+and thus is capable of storing information.
+An arbitrary neural network $N$ encodes a program $P_N$
+and thus is also capable of storing information.
+One type of information a network may store
+is an encoding of a second neural network $D(N)$.
+But just as the meaning of a word
+depends on the language being spoken,
+so does the network encoded by $N$
+depend on the semantics chosen.
+
+To establish these semantics,
+we may define what $N$ should be
+in order to encode a given network $D(N)$.
+This is the problem of \term{encoding}.
+But if we want a network $N$
+to generate another network $D(N)$,
+then $D(N)$ is not given.
+It is generated.
+Solving the problem of encoding does not help.
+
+An alternative way to establish the semantics
+is to define what network $D(N)$ is encoded
+by a given network $N$.
+This is the problem of \term{decoding},
+and we focus on it.
+Solving the problem of decoding
+consists of defining $D$
+and allows us to have neural networks
+generate other neural networks.
+
+In order to give a network $N$
+the power to generate another network
+in an interesting way,
+we prefer the decoding function $D$
+to be neither completely stable
+nor completely chaotic.
+Instead, we want it somewhere around the edge of chaos.%
+\cite{langton1990edgechaos}
+This seems to pose a challenge,
+but the function or program a neural network encodes
+satisfies exactly this property.
+So we can define $D(N)$ in terms of $f_N$ or $P_N$.
+In other words, part of computing $D(N)$
+can be applying $f_N$ or $P_N$.
+
+We can consider the features of $D(N)$,
+such as how its neurons connect,
+to be stored at particular points
+in $f_N$
+or to be outputs of $P_N$.
+In this way,
+we draw on the notion of a compositional
+pattern-producing network.\cite{stanley2007cppn}
+
+~
+
+%Concretely, for a feedforward network $N$,
+%we can consider it to encode $D(N)$
+%by encoding various features,
+%such as the connections,
+%%we can consider $D(N)$ to be stored at a collection
+%we can take the value of $f_N$ at various points
+%and interpret them, for example,
+%as neural connections.
+
+We consider ? schemes.
+
+[x0 ... xn] [y0 ... yn] ---> w
+
+[L S t s] ---> [n n w]
+
+arbitrary network
+
+\section*{Evolution}
+
+fitness functions
+
+\section*{Experiments}
+
+\section*{Results}
+
+\section*{Conclusion. Future Work.}
 
 \bibliography{selfrep}
 \bibliographystyle{plain}
