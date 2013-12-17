@@ -1,3 +1,4 @@
+#!/usr/bin/python
 '''
 Created on Nov 16, 2013
 
@@ -124,7 +125,7 @@ if __name__ == '__main__':
 #     error += abs(weight - output)
 #       
 #   print error
-  
+   
 #     n = generateNetwork([2,2,1])
 #     n.params = [1,0,0,0,0,0]
 #     print n.params
