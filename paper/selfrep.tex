@@ -126,24 +126,7 @@ or to be outputs of $P_N$.
 %we draw on the notion of a compositional
 %pattern-producing network.\cite{stanley2007cppn}
 
-\section{Self-Replicating Feed-forward Neural Networks}
-\label{feedforward}
-
-To create a self-replicating feed-forward neural network, we first use the pyBrain neural network library \cite{schaul2010} to create an initial neural network that has a fixed topology. By fixed topology, we mean that the number of input neurons, output neurons, hidden layers, neurons, and number of connections remain constant. The only parameters we plan to optimize in order to generate self-replicating neural networks are  the weights of the connections between neurons. Since a feed-forward neural network can have many variations in its topology, we have chosen a simple structure that makes the most sense. 
-
-One major challenge is deciding what kind of input to feed into the neural network and how to interpret the output of the neural network as another neural net. For simplicity, we decided on giving our neural network a N-bit vector of binary numbers as input. If we topologically linearize all the connections in the neural network, we can associate the value of binary vector with a corresponding connection. For example, the binary vector 1001 can be associated with the 5th connection in a small network with 8 connections in total. Accordingly, the output of the neural network is a single value and it represents the weight of the connection specified by the input vector. Thus, by feeding the neural network a set of inputs that map to all the connections in the network, we can generate weights for each of connections. This means that the network is capable of generating another net exactly like itself in topology, but with possibly different connection weights. 
-
-The next step is come up with a method to optimize the connection weights of the original network such that child network generated also has the same connection weight. Given the lack of gradients in this problem, we decide to rely on a black-box optimization approach to optimize the connection weights of the parent network. Thus we will require a fitness function that evaluates how close the the neural network is to generating a child network exactly like itself. To compute a fitness value, as seen in Fig.~\ref{pseudo}, we use the parent network to compute the connection weights of the child network, determine the error between the new connection weight and its original value in the parent network, and return the sum of all the errors. Now we can try a variety of different black-box optimization methods, including genetic algorithms \cite{deb2002fast}, CMAES \cite{hansen2003reducing}, and NES \cite{wierstra2008natural} to try to minimize the error and maximize the fitness of the neural network. Experimentally, we found that using CMAES resulted the most improvement in fitness every generation. 
-
-\begin{figure}[h]
-\begin{center}
-  \includegraphics[width=0.8\linewidth]{pseudo.png}
-\end{center}
-   \caption{Function for computing fitness of a neural network. For each connection in the parent network, we convert it into a binary vector, feed it as input, and get the connection weight of the same connection in the child network. We compare the difference between the child and parent weights and sum up all differences as error, which is then inverted to become a fitness value.}
-\label{pseudo}
-\end{figure} 
-
-\section*{Related Work}
+\section{Related Work}
 
 Genetic programming?
 Compositional pattern-producing networks.
@@ -156,8 +139,47 @@ Compositional pattern-producing networks.
 %\section{Evolution}
 %algorithms. fitness functions.
 
+\section{Self-Replicating Feed-forward Neural Networks}
+\label{feedforward}
+
+To create a self-replicating feed-forward neural network, we first use the pyBrain neural network library \cite{schaul2010} to create an initial neural network that has a fixed topology. By fixed topology, we mean that the number of input neurons, output neurons, hidden layers, neurons, and number of connections remain constant. The only parameters we plan to optimize in order to generate self-replicating neural networks are  the weights of the connections between neurons. Since a feed-forward neural network can have many variations in its topology, we have chosen a simple structure that makes the most sense. 
+
+One major challenge is deciding what kind of input to feed into the neural network and how to interpret the output of the neural network as another neural net. For simplicity, we decided on giving our neural network a N-bit vector of binary numbers as input. If we topologically linearize all the connections in the neural network, we can associate the value of binary vector with a corresponding connection. For example, the binary vector 1001 can be associated with the 5th connection in a small network with 8 connections in total. Accordingly, the output of the neural network is a single value and it represents the weight of the connection specified by the input vector. Thus, by feeding the neural network a set of inputs that map to all the connections in the network, we can generate weights for each of connections. This means that the network is capable of generating another net exactly like itself in topology, but with possibly different connection weights. 
+
+The next step is come up with a method to optimize the connection weights of the original network such that child network generated also has the same connection weight. Given the lack of gradients in this problem, we decide to rely on a black-box optimization approach to optimize the connection weights of the parent network. Thus we will require a fitness function that evaluates how close the the neural network is to generating a child network exactly like itself. To compute a fitness value, as seen in Fig.~\ref{pseudo}, we use the parent network to compute the connection weights of the child network, determine the error between the new connection weight and its original value in the parent network, and return the inverted sum of all the errors. Now we can try a variety of different black-box optimization methods, including genetic algorithms \cite{deb2002fast}, CMAES \cite{hansen2003reducing}, and NES \cite{wierstra2008natural} to try to minimize the error and maximize the fitness of the neural network. Experimentally, we found that using CMAES resulted the most improvement in fitness every generation. 
+
+\begin{figure}[h]
+\begin{center}
+  \includegraphics[width=0.8\linewidth]{pseudo.png}
+\end{center}
+   \caption{Function for computing fitness of a neural network. For each connection in the parent network, we convert it into a binary vector, feed it as input, and get the connection weight of the same connection in the child network. We compare the difference between the child and parent weights and sum up all differences as error, which is then inverted to become a fitness value.}
+\label{pseudo}
+\end{figure} 
+
 \section{Experimental Results}
 \label{results}
+
+For our first experiment, we test to see if feed-forward neural networks could replicate themselves using the method described in section \ref{feedforward}. For our feed-forward neural network topology, we decide on having an input layer with 8 neurons, 2 hidden layers with 12 neurons each, and finally an output layer with a single neuron. This network structure seems to have a good balance between complexity, number of inputs, and performance. All layers are fully connected and each neuron uses a sigmoid as its activation function. The sigmoid allows the neural network to output any range of values between -1 and 1. Accordingly, the connect weights of all the neurons are all randomly initialized between -1 and 1. We optimize using CMAES as described in the methodology for 500 generations.
+
+Fig.~\ref{result1} shows how error goes down as a function of the number of generations that black-box optimization is applied to connection weights of the parent network. As we can see by the blue curve, the error starts off around 150 and smoothly converges to a value of around 5 at the 500th generation mark. To show that our optimization method and fitness functions are robust, we deliberately clamp a certain percentage of the connection weights (10\%, 20\%, and 40\%), which results in the other curves shown in Fig.~\ref{result1}. While the final errors are not as good as when none of the weights are clamped, significant reductions in errors are still present.
+
+However, while optimizing the connections of the parent network results in a child network that is similar to the parent, the connection weights themselves do not seem to be very interesting. Fig.~\ref{histogram}(a) and (b) shows a histogram of the connection weights of both the optimized parent network and the resulting child network respectively. As we can see, the connections in both networks have roughly same weights at around roughly the 0.10-0.15 range. From this, we can conclude that if all the weights in a neural network are roughly the same, the output of the neural network is also roughly the same as an average of all the weight values. Thus the question arises whether it is possible to create self-replicating networks where the weights have interesting distributions. 
+
+\begin{figure}[h]
+\begin{center}
+  \includegraphics[width=1.0\linewidth]{result1.png}
+\end{center}
+   \caption{This chart shows error (as defined in section \ref{feedforward}) as a function of number of generations. The legend shows the percentage of connections that are clamped (fixed so that they do not change).}
+\label{result1}
+\end{figure}
+
+\begin{figure}[h]
+\begin{center}
+  \includegraphics[width=1.0\linewidth]{result1.png}
+\end{center}
+   \caption{Add in later.}
+\label{histogram}
+\end{figure}
 
 \section{Conclusion. Future Work.}
 \label{conclusion}
