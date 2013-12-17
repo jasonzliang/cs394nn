@@ -38,6 +38,15 @@ class ArbitraryNeuralNetwork:
       shape = (self.size, self.size)
       self.weight = numpy.zeros(shape)
 
+      # XXX hacky addition
+      self.frozen = False
+      self.fitness = 0
+      self.deepestDecode = self
+
+   # XXX hacky addition
+   def mutated(self):
+      net = self.copy()
+
    def copy(self):
       net = ArbitraryNeuralNetwork(self.activationFunction)
       net.weight = self.weight.copy()

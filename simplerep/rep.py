@@ -92,6 +92,59 @@ def decodeANN(net, maxSteps):
 
 
 
+# POP_SIZE
+# create a random population
+# loop
+   # for each unfrozen individual i
+      # get the decode target (child, or parent if no child yet)
+      # decode the target n times (till bad or hit max)
+      # add n to the fitness of i
+      # set the child to the ultimate decode result
+      # freeze if not hit max
+
+   # PARENT_COUNT
+   # CHILD_COUNT
+   # take the top PARENT_COUNT individuals
+   # mutate them to get a child
+   # replace the bottom CHILD_COUNT individuals
+
+POP_SIZE = 64
+PARENT_COUNT = 2
+CHILD_COUNT = 2
+MAX_STEPS = 32 * 32
+MAX_DECODES = 16
+MIN_NEURON_COUNT
+myRandomNet = lambda: randomNet(128) #randomNet(random.randrange(8,256))
+population = [myRandomNet() for _ in range(POP_SIZE)]
+
+def decodeRepeat(net, maxDecodeCount):
+   nDecodes = 0
+   while nDecodes < maxDecodeCount:
+      net = decodeANN(net, MAX_STEPS)
+      if net.size < MIN_NEURON_COUNT:
+         break
+      nDecodes += 1
+   return (net, nDecodes)
+
+def evoStep():
+   for i in population:
+      if i.frozen:
+         continue
+      target = i.deepestDecode
+      offspring, nDecodes = decodeRepeat(target, MAX_DECODES)
+      i.deepestDecode = offspring
+      i.fitness += nDecodes
+      if nDecodes < MAX_DECODES:
+         i.frozen = True
+
+   population.sort(key = lambda i: i.fitness, reverse = True)
+
+   top = population[0 : PARENT_COUNT]
+   children = [i.mutated() for i in top]
+   population[-CHILD_COUNT : ] = children
+
+
+
 import collections
 Candidate = collections.namedtuple('Candidate', ['ind','gen'])
 
@@ -100,33 +153,26 @@ generation = 0
 # create a population of random nets
 POP_SIZE = 64
 MAX_STEPS = 32 * 32
-myRandomNet = lambda: randomNet(random.randrange(8, 256))
+myRandomNet = lambda: randomNet(128) #randomNet(random.randrange(8,256))
 population = [
    Candidate(myRandomNet(), generation)
    for _ in range(POP_SIZE)]
 
 # enforcing at least some criterion on offspring
 # rewards useful, long germ lines
-N_NEURON_MIN = 1
-while True:
+def evoStep()
+   N_NEURON_MIN = 16
    try:
       iParent = random.randrange(len(population))
       parent = population[iParent].ind
       child = decodeANN(parent, MAX_STEPS)
-
-      #if False:
-      #   if child.size < N_NEURON_MIN:
-      #      population[iParent] = Candidate(
-      #         myRandomNet(), 0)
-      #   else:
-      #      population[iParent] = Candidate(
-      #         child, population[iParent].gen + 1)
 
       # kill parents with cruddy children
       if child.size < N_NEURON_MIN:
          # make this better
          # must allow good networks to take over?
          # but you kinda do. just weakly
+         # don't remove
          population[iParent] = Candidate(myRandomNet(), generation)
          print(".", end="")
       # otherwise propogate by replacing another individual
@@ -145,8 +191,9 @@ while True:
       print()
       fs = "{:4d}"
       print( " ".join(fs.format(p.gen) for p in populationSorted) )
+      print()
       print( " ".join(fs.format(p.ind.size) for p in populationSorted) )
       input()
 
-#net = randomNet(16)
-#print(decodeANN(net).activationFunction)
+while True:
+   evoStep()
