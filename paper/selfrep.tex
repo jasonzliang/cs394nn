@@ -41,7 +41,7 @@ that can be cast as optimization problems.
 Until now, implementations have been
 in large part hand designed.
 Designers struggle to find meaningful constructs
-and optimal tunings that allow evolutionary compuatation
+and optimal tunings that allow evolutionary computation
 to efficiently and effectively solve problems.
 %to efficient, effective evolutionary computation.
 %This design is part of solving target problems,
@@ -333,8 +333,7 @@ and output at its own pace.
 \section{Experimental Results}
 \label{results}
 
-For our first experiment,
-we test to see if feedforward neural networks
+In an experiment, we test to see if feedforward neural networks
 could replicate themselves using the method described
 in section \ref{feedforward}.
 For our feedforward neural network topology,
@@ -350,7 +349,9 @@ The sigmoid allows the neural network
 to output any range of values between -1 and 1.
 Accordingly, the connection weights
 of all the neurons are all randomly initialized between -1 and 1.
-We optimize using CMA-ES
+Experimentally, out of all the black box optimization methods, 
+we found that using CMA-ES resulted in the most improvement 
+in fitness every generation. Thus, we optimize using CMA-ES
 as described in the methodology for 500 generations.
 
 Fig.~\ref{result1} shows how error goes down
@@ -379,6 +380,16 @@ Fig.~\ref{histogram}(a) and (b) shows a histogram
 of the connection weights
 of both the optimized parent network
 and the resulting child network respectively.
+As we can see, the connections in both networks
+have roughly the same weights
+at around roughly the 0.10 to 0.15 range.
+From this, we can conclude that
+if all the weights in a neural network are roughly the same,
+the output of the neural network are also in the same range,
+no matter what kind of input is given.
+Thus the question arises whether it is
+possible to create self-replicating networks
+where the weights have interesting distributions. 
 
 \begin{figure}[h]
 \begin{center}
@@ -390,28 +401,41 @@ and the resulting child network respectively.
 
 \begin{figure}[h]
 \begin{center}
-  \includegraphics[width=1.0\linewidth]{result1.png}
+  \includegraphics[width=1.0\linewidth]{histogram.png}
 \end{center}
-   \caption{Add in later.}
+   \caption{(a) Histogram of weights of parent network after optimization. (b) Histogram of weights of child network that result from parent network.}
 \label{histogram}
 \end{figure}
 
-Experimentally, we found that using CMA-ES resulted in the most improvement in fitness every generation.
-
-\section{Conclusion. Future Work.}
+\section{Conclusion and Future Work.}
 \label{conclusion}
 
-As we can see, the connections in both networks
-have roughly same weights
-at around roughly the 0.10 to 0.15 range.
-From this, we can conclude that
-if all the weights in a neural network are roughly the same,
-the output of the neural network
-is also roughly the same as an average
-of all the weight values.
-Thus the question arises whether it is
-possible to create self-replicating networks
-where the weights have interesting distributions. 
+In this project, we demonstrate that it is possible to generate
+a feed-forward neural network that when given a series of nonrandom inputs,
+output the weights of another child network which also
+have roughly the same connection weights. Unfortunately, both the
+child and parent networks are uninteresting in that the weights are all roughly
+the same value. A major question that remains is whether self replicating neural 
+networks with unique and interesting weight distributions can be generated.
+
+Given our experiments with neural networks, we strongly suspect that this is
+not possible with just a fully connected feed-forward structure. Instead, we believe
+that it might be possible to incrementally build up a neural network with arbitrary
+complex topology using NEAT \cite{stanley2004efficient} that capable is of outputting
+its own topology and weights when given an ordered, logical set of inputs. 
+For future work, we plan to use NEAT with a fitness 
+function such as the one used for feed-forward neural networks to create self-replicating
+neural networks. However, we also strongly
+suspect that the fitness landscape for this type of problem is highly deceptive.
+Therefore, we will also like to try using novelty search \cite{lehman2008exploiting}
+instead of a conventional fitness function.
+
+Finally, another important issue is whether these self-replicating networks
+can be used to do useful work. We hypothesis that these kind of networks exhibit
+behavior that are on the ``edge of chaos" and thus have maximized their potential
+to do computation. Thus, we plan to explore whether the structure of
+self-replicating networks allow them to be easily tuned towards certain tasks, such as digit
+recognition or object classification.
 
 \renewcommand{\refname}{\section{References}}
 \bibliography{selfrep}
