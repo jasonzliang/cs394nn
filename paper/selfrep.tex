@@ -11,6 +11,8 @@
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{subcaption}
+\usepackage{algorithm}
+\usepackage{algorithmic}
 
 \usepackage{kpfonts}
 \usepackage[T1]{fontenc}
@@ -30,6 +32,32 @@
 \maketitle
 
 \begin{abstract}
+To use evolutionary computation
+to solve problems effectively and efficiently,
+we need good incarnations.
+Many hand-designed schemes exist,
+but although such schemes have been selected or tuned
+using evolutionary computation,
+we suspect this is too limiting.
+%they have not been \emph{created}
+%using evolutionary computation.
+By evolving a population
+that guides its own evolution,
+we can escape hand-design.
+To take a step toward doing so,
+we present a way of evolving neural networks
+that generate other neural networks.
+%This can form the foundation
+%for later developing
+%a full, automatically designed and optimized
+%scheme for evolutionary computation.
+We present techniques for evolving
+neural networks that generate other neural networks.
+We find that they work
+but that the networks produced
+can have pathological or trivial structure.
+%but we can get better results
+%but instead evoling schemes.
 \end{abstract}
 
 \section{Introduction}
@@ -87,8 +115,10 @@ Since arbitrary neural networks are computationally powerful,%
 we can use them as candidate solution representations
 and also as population operators.
 Here however,
+as a first step,
 we only evolve networks
-that reproduce themselves.
+that generate sensible networks
+or that generate themselves.
 
 %[explain how programs that program
 %would give us this]
@@ -104,12 +134,16 @@ that reproduce themselves.
 
 %[Explain why self-replication.]
 
-The following is an overview of the rest of the paper:
+The following is an overview of the rest of the paper.
 In section \ref{problemstatement},
 we discuss the general problem of generating networks.
 In section \ref{feedforward},
 we go over our methods
 for constructing self-replicating feedforward neural networks.
+In section~\ref{arbitrary},
+we discuss our methods
+for constructing replicating arbitrarily recurrent
+neural networks.
 In section \ref{results},
 we discuss experimental results.
 Finally in section \ref{conclusion},
@@ -118,29 +152,65 @@ we present conclusions and future work.
 \section{Related Work}
 \label{related}
 
-Meta-optimization
-has been used to tune implementations
-of evolutionary computation.%
-\cite{brest2006param}
+Evolutionary computation
+has many incarnations
+and has been used to solve a wide variety of problems.
+%\cite{angeline1994evolutionary}
+It has been used in general to optimize parameters
+\cite{back1993overview}
+and has been used to solve numerous engineering problems
+\cite{dasgupta1997evolutionary},
+such as designing mission-critical attennas for NASA
+\cite{hornby2006automated}.
+It has also been useful
+even when numerous criteria must be satisfied
+\cite{fonseca1995overview}.
 
-Hyper-heuristics
-have been used to avoid chosing a single fixed implementation.
+In a thread more similar to our work,
+evolutionary computation has been used
+to tune existing implementations
+of evolutionary computation
+in a process dubbed meta-optimization
+\cite{brest2006param}.
+These implementations
+have parameters that must be selected,
+and selecting them optimally by hand is difficult
+and can be time consuming.
 
-Parameter-free, self-optimizing metaheuristic.
+So-called hyper-heuristics
+have been used to avoid choosing a single fixed implementation
+\cite{burke2010classification},
+and parameter-free, self-optimizing metaheuristics
+have also been used to avoid
+manual tuning \cite{brest2006param}.
+But both of these are limited
+to manipulating existing implementations
+of evolutionary computation.
 
-Gentic programming has been used
-to automatically develop computer programs.
-Evolutionary 
+Evolutionary computation
+has also been used to program computers automatically
+\cite{koza1999genetic}.
+We are also interested in programming computers automatically,
+but we are not interested so much
+in producing programs
+for solving particular problems
+as we are in producing programs
+that produce other programs
+(possibly \textit{ad infinitum}).
 
-We draw on the notion of a CPPN (compositional
+%Gentic programming has been used
+%to automatically develop computer programs.
+%Evolutionary
+To produce programs that program,
+we draw on the notion of a CPPN (compositional
 pattern-producing network).\cite{stanley2007cppn}
 CPPNs, however, are meant to encode the structure
-of a network, whereas we use them
+of a network, whereas we use corruptions of them
 for more general purpose information storage
 and pattern generation.
 
-Genetic programming?
-Compositional pattern-producing networks.
+%Genetic programming?
+%Compositional pattern-producing networks.
 
 \section{Decoding Networks}
 \label{problemstatement}
@@ -249,6 +319,23 @@ This means that the network is capable of generating another net
 exactly like itself in topology,
 but with possibly different connection weights. 
 
+\begin{figure}[h]
+\begin{center}
+  \includegraphics[width=0.8\linewidth]{pseudo.png}
+\end{center}
+   \caption{Function for computing fitness of a neural network.
+For each connection in the parent network,
+we convert it into a binary vector,
+feed it as input,
+and get the connection weight
+of the same connection in the child network.
+We compare the difference
+between the child and parent weights
+and sum up all differences as error,
+which is then inverted to become a fitness value.}
+\label{pseudo}
+\end{figure} 
+
 The next step is to come up with
 a method to optimize the connection weights
 of the original network such that child network generated
@@ -273,23 +360,6 @@ and NES \cite{wierstra2008natural}
 to try to minimize the error
 and maximize the fitness of the neural network.
 
-\begin{figure}[h]
-\begin{center}
-  \includegraphics[width=0.8\linewidth]{pseudo.png}
-\end{center}
-   \caption{Function for computing fitness of a neural network.
-For each connection in the parent network,
-we convert it into a binary vector,
-feed it as input,
-and get the connection weight
-of the same connection in the child network.
-We compare the difference
-between the child and parent weights
-and sum up all differences as error,
-which is then inverted to become a fitness value.}
-\label{pseudo}
-\end{figure} 
-
 \section{Replicating Arbitrary Networks}
 \label{arbitrary}
 
@@ -297,8 +367,8 @@ We also worked with arbitrarily recurrent neural networks.
 Again we are faced with the problem
 of specifying inputs and outputs.
 One option is to do so in the same way
-as with feedforward neural networks
-as summarized in figure~\ref{arbitrarybadio}.
+as with feedforward neural networks.
+%as summarized in figure~\ref{arbitrarybadio}.
 But since we will need
 to repeatedly halt the network
 after some arbitrary interval
@@ -310,25 +380,175 @@ the power of recurrency.
 %we must halt them
 %But this requires running the network
 %But this does not exploit
-
-Instead we allow the network to run freely
+So instead we allow the network to run freely
 and output at its own pace.
-[edit point]
+
+We use a sigmoidal activation function $a$ onto $[0, 1]$.
+%We use the activation function $a : \mathbb{R} \to [0, 1]$
+%defined by $a(x) = 1 / exp$
+Because of the distortion
+that bounded activation functions introduce,
+treating or interpreting an input or output
+as an unbounded signal
+can make large parts of its range unuseable.
+So we treat each output
+as a single bit.
+As summarized in figure~\ref{arbitraryio},
+we allocate several bits
+to each output number,
+and we reconstruct it from the bit string
+$B = b_0...b_n$
+as $N(B) = \sum \operatorname{round}(b_0) \cdot 2^0$.
+To recover the weight we compute $\tan(m \cdot N(B) - b)$
+where $m$ and $b$ are chosen so that $m \cdot N(B) - b$
+always lies in some subset of a single period of $\tan$.
+This allows weights a wide range
+while retaining fine granularity near 0.
+
+Notice that we specify no inputs.
+This is because the neural network is taken to be a program
+that will output another neural network
+as a sequence of connections.
+Each output tuple $(r, t, s, w_{t\,s})$
+is interpreted as a connection to $t$ from $s$
+with weight $w_{t\,s}$ if and only if $r$ is on.
+Since the halting problem is not computable,
+there is no way to know
+when the last connection has been output.
+To cope with this
+we define $C_\text{max}$ to be 65536
+and halt the network after it has run
+for $C_\text{max}$ steps.
+
+%So input
+%each input and output should be interpreted as discrete
+%rather than 
+%Due to the distortive nature of bounded activation functions,
+
+%\begin{figure}[h]
+%  \centering
+%  \begin{tabular}{@{}ll@{}}
+%  \toprule
+%  inputs             & outputs \\
+%  \midrule
+%  neuron count flag  & neuron count \\
+%  target neuron, $t$ & weight $w_{t \, s}$ \\
+%  source neuron, $s$ & \\
+%  \bottomrule
+%  \end{tabular}
+%  \caption{}
+%  \label{arbitrarybadio}
+%\end{figure}
+
+\begin{figure}[ht]
+  \begin{minipage}[b]{0.45\linewidth}
+  \centering
+  %\begin{figure}[h]
+    %\centering
+    \begin{tabular}{@{}llll@{}}
+    \toprule
+    inputs             &           & outputs & \\
+    \cmidrule(rl{0em}){1-2}          \cmidrule(rl{0em}){3-4}
+                       & bits      &         & bits \\
+    \midrule
+                       &           & ready signal, $r$     & 1 \\
+                       &           & target neuron, $t$   & 8 \\
+                       &           & source neuron, $s$   & 8 \\
+                       &           & weight, $w_{t \, s}$ & 8 \\
+    \bottomrule
+    \end{tabular}
+  %\end{figure}
+  \end{minipage}
+  %
+  \hspace{\fill}
+  %
+  \begin{minipage}[b]{0.45\linewidth}
+    \centering
+    \begin{tabular}{@{}llll@{}}
+    \toprule
+    inputs             &           & outputs & \\
+    \cmidrule(rl{0em}){1-2}          \cmidrule(rl{0em}){3-4}
+                       & bits      &         & bits \\
+    \midrule
+                       &           & ready signal, $r$    & 1 \\
+    task input, $x$    & 1         & task output, $o$     & 1 \\
+    task input, $y$    & 1         &                      &   \\
+                       &           & target neuron, $t$   & 8 \\
+                       &           & source neuron, $s$   & 8 \\
+                       &           & weight, $w_{t \, s}$ & 8 \\
+    \bottomrule
+    \end{tabular}
+  \end{minipage}
+  \caption{Inputs and outputs used
+    (left) in the original simple scheme
+    and (right) with a task that eases
+    computing the fitness function.}
+  \label{arbitraryio}
+\end{figure}
+
+
+To evolve these networks we again use NEAT.
+Since we are trying to evolve replication,
+we choose a fitness function that does so directly.
+We decode the network repeatedly
+until the result is no longer sensible
+and reward it for more decodings.
+This however presents two problems:
+it is difficult to judge when a network is not sensible
+and this fitness is discrete and so has a weak gradient.
+
+To address this we introduce a task,
+as summarized in figure~\ref{arbitraryio}.
+The task need not be (and perhaps should not be)
+difficult.
+It need only give us a way
+of weeding out networks that are not sensible.
+In our experiments,
+the task was computing logical or.
+To judge the fitness of a network $N$,
+we repeatedly evaluate $N$ at the task
+and then decode it to get $D(N)$
+and do the same with $D(N)$.
+This is summarized in figure~\ref{fitalg}.
 
 \begin{figure}[h]
   \centering
-  \begin{tabular}{ll}
-  \toprule
-  inputs            & outputs \\
-  \midrule
-  neuron count flag & neuron count \\
-  target neuron, t  & weight $w_{t,s}$ \\
-  source neuron, s  & \\
-  \bottomrule
-  \end{tabular}
-  \caption{}
-  \label{arbitrarybadio}
+  %\begin{algorithm}
+  %\par
+  \begin{minipage}[c]{.5\textwidth}
+  \begin{algorithmic}
+  \STATE $f \leftarrow 0$
+  \LOOP
+  \STATE $f' \leftarrow$ performance of \textit{net} at task
+  \IF{$f'$ does not exceed a threshold}
+  \RETURN $f$
+  \ENDIF
+  \STATE $f \leftarrow f + f'$
+  \STATE \textit{net} $\leftarrow$
+    $\operatorname{decode}(\textit{net})$
+  \ENDLOOP
+  \end{algorithmic}
+  %\end{algorithm}
+  \caption{Determining the total fitness
+    of a neural network \textit{net}.}
+  \label{fitalg}
+  \end{minipage}
 \end{figure}
+
+%\begin{figure}[h]
+%  \centering
+%  \caption{}
+%  \label{arbitrarybetterio}
+%\end{figure}
+
+
+%To evaluate the fitness of a ne
+%In this setup however
+
+We tried several other cursory approaches that failed,
+and so carefully developed this approach.
+At the time of this publishing, however,
+we have not successfully run our experiments.
 
 \section{Experimental Results}
 \label{results}
@@ -431,7 +651,7 @@ Therefore, we will also like to try using novelty search \cite{lehman2008exploit
 instead of a conventional fitness function.
 
 Finally, another important issue is whether these self-replicating networks
-can be used to do useful work. We hypothesis that these kind of networks exhibit
+can be used to do useful work. We hypothesize that these kind of networks exhibit
 behavior that are on the ``edge of chaos" and thus have maximized their potential
 to do computation. Thus, we plan to explore whether the structure of
 self-replicating networks allow them to be easily tuned towards certain tasks, such as digit
